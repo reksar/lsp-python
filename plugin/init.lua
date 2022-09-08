@@ -4,7 +4,7 @@ local function shellout(txt)
   local rc_start, rc_end = txt:find("%d+%s*$")
   local rc = txt:sub(rc_start, rc_end)
 
-  -- (rc_start - 1) ends with "\n"
+  -- (rc_start - 1) - ends with "\n"
   -- (rc_start - 2) - without last "\n"
   local out = txt:sub(1, rc_start - 2)
 
@@ -22,7 +22,8 @@ end
 
 local vi = vim.fn
 local plugin_path = vi.expand("<sfile>:p:h:h")
-local ext = vi.has("win32") and ".bat" or ".sh"
+local is_win = vi.has("win32") == 1
+local ext = is_win and ".bat" or ".sh"
 local ensure = vi.expand(plugin_path .. "/scripts/ensure" .. ext)
 local venv = vi.expand(vi.stdpath("data") .. "/lsp/python")
 local ensure_pylsp = ensure .. " \""..venv.."\""
