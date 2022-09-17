@@ -10,8 +10,7 @@ end
 
 
 local function vimlines(txt)
-  -- Transform `txt` from "line1\nline2" to "['line1', 'line2']"
-
+  -- Transforms `txt` from "line1\nline2" to "['line1', 'line2']"
   local lines = vim.fn.split(txt, "\n")
   local quoted = map_quote(lines)
   local comma_separated = vim.fn.join(quoted, ",")
@@ -20,14 +19,11 @@ end
 
 
 local function show_window(txt)
-
-  -- Load window API.
-  local plugin_path = vim.fn.expand("<sfile>:p:h:h")
+  local plugin_path = require("nvim-lsp-python.path")
   local window = vim.fn.expand(plugin_path .. "/scripts/window.vim")
   vim.cmd("source " .. window)
-
-  -- Show `txt` `lines` in splitted window on `VimEnter`.
-  vim.cmd("au VimEnter * ++once call NvimLspPythonWindow("..vimlines(txt)..")")
+  vim.cmd("call NvimLspPythonWindow("..vimlines(txt)..")")
+  vim.cmd("delfunction NvimLspPythonWindow")
 end
 
 

@@ -1,1 +1,1 @@
-lua require("nvim-lsp-python")
+lua vim.schedule(require("nvim-lsp-python"))

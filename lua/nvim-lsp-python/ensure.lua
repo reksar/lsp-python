@@ -30,20 +30,18 @@ local function parse(shell_output)
 end
 
 
+local function ensure_script()
+  local plugin_path = require("nvim-lsp-python.path")
+  local scripts_path = vim.fn.expand(plugin_path .. "/scripts")
+  local sh = vim.fn.has("win32") == 1 and ".bat" or ".sh"
+  return vim.fn.expand(scripts_path .. "/ensure" .. sh)
+end
+
+
 local function ensure_cmd()
-
-  -- LSP will be installed to this Python venv if not exists globally.
-  local vimdata = vim.fn.stdpath("data")
-  local venv = vim.fn.expand(vimdata .. "/lsp/python")
-
-  -- Main shell script to ensure a Python LSP.
-  local is_win = vim.fn.has("win32") == 1
-  local sh = is_win and ".bat" or ".sh"
-  local plugin_path = vim.fn.expand("<sfile>:p:h:h")
-  local scripts = vim.fn.expand(plugin_path .. "/scripts")
-  local ensure_script = vim.fn.expand(scripts .. "/ensure" .. sh)
-
-  return ensure_script .. " \""..venv.."\""
+  -- LSP will be installed to this Python `venv` if does not exists globally.
+  local venv = vim.fn.expand(vim.fn.stdpath("data") .. "/lsp/python")
+  return ensure_script() .. " \""..venv.."\""
 end
 
 
