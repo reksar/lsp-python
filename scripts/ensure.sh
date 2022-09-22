@@ -3,14 +3,12 @@
 
 return_pylsp() {
   echo $1
-  echo 0
   exit 0
 }
 
 
 return_err() {
   echo $2
-  echo $1
   exit $1
 }
 
