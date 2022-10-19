@@ -33,10 +33,18 @@ function! s:last(lines)
 endfunction
 
 
+function! s:cmd(log)
+  " The `last` `log` line must be a `cmd` to run the Python lang server.
+  const line = s:last(a:log)
+  " Translate '\' -> '/' instead of backslash escaping in Windows path.
+  const cmd = fnamemodify(line, ':gs?\?/?')
+  " Trim the trailing <CR> (represented as ^M) char in Windows path.
+  return cmd[-1:] == nr2char(13) ? cmd[:-2] : cmd
+endfunction
+
+
 function! s:run_lang_server(log)
-  " The `last` `log` line must be a `cmd` to run Python lang server.
-  const cmd = s:last(a:log)
-  exe 'lua require("nvim-lsp-python")("'.cmd.'")'
+  exe 'lua require("nvim-lsp-python")("'.s:cmd(a:log).'")'
   LspStart
 endfunction
 
