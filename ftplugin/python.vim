@@ -35,11 +35,9 @@ endfunction
 
 function! s:cmd(log)
   " The `last` `log` line must be a `cmd` to run the Python lang server.
-  const line = s:last(a:log)
+  const cmd = s:last(a:log)
   " Translate '\' -> '/' instead of backslash escaping in Windows path.
-  const cmd = fnamemodify(line, ':gs?\?/?')
-  " Trim the trailing <CR> (represented as ^M) char in Windows path.
-  return cmd[-1:] == nr2char(13) ? cmd[:-2] : cmd
+  return fnamemodify(cmd, ':gs?\?/?')
 endfunction
 
 
@@ -65,11 +63,37 @@ function! s:show_err(scripts_path, rc, log)
 endfunction
 
 
+function! s:batch_encoding()
+  const DEFAULT_ENCODING = 850
+  " Should be "blah-blah-blah: <encoding>"
+  silent const chcp = system('chcp')
+  const encoding = str2nr(matchstr(chcp, ':\s*\zs\d\+'))
+  return encoding ? encoding : DEFAULT_ENCODING
+endfunction
+
+
+function! s:decode_batch_output(lines)
+  " Windows-like line ending - Carriage Return / <CR> / ^M / Ctrl+M
+  const CR = nr2char(13)
+  " Trim the trailing <CR> chars.
+  const noCR = map(a:lines, {_, line -> line[-1:] == CR ? line[:-2] : line})
+  " Convert to UTF-8
+  return map(noCR, {_, line -> iconv(line, s:batch_encoding(), 'utf-8')})
+endfunction
+
+
+function! s:decode_shell_output(lines)
+  " It's expected that all is OK with the UNIX shell output.
+  return has('win32') ? s:decode_batch_output(a:lines) : a:lines
+endfunction
+
+
 function! s:job_finish(job_id, rc, event) dict
+  const log = s:decode_shell_output(self.log)
   if a:rc
-    call self.err(a:rc, self.log)
+    call self.err(a:rc, log)
   else
-    call self.then(self.log)
+    call self.then(log)
   endif
 endfunction
 
