@@ -1,3 +1,14 @@
+function! s:is_lsp_running()
+  " TODO
+  return 0
+endfunction
+
+
+if exists('s:venv') || s:is_lsp_running()
+  finish
+endif
+
+
 " The arg will be passed to the main shell script. Python lang server will be
 " installed into this `venv` dir if does not exists globally.
 const s:venv = expand(stdpath('data') . '/lsp/python')
